@@ -1,47 +1,26 @@
-function useRequest(url, callback) {
-    const value = Number(document.querySelector('.input').value);
-    if (value > 0 && value <= 10) {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', url+value, true);
-        xhr.onload = function() {
-            if (xhr.status != 200) {
-                console.log('Статус ответа: ', xhr.status);
-            } else {
-                const result = JSON.parse(xhr.response);
-                if (callback) {
-                    callback(result)
-                }
-            }
-        }
-        xhr.onerror = function() {
-            console.log(`Ошибка! Статус ответа: ${xhr.status}`);
-        };
-        xhr.send();
-    } else {
-        callback(false);
-    }
-
-};
-const btnNode = document.querySelector('.j-btn-request');
-const resultNode = document.querySelector('.j-result');
-function displayResult(apiData) {
-    
-    if (apiData !== false) {
-        let cards = '';
-        apiData.forEach(item => {
-            const cardBlock = `
-                <div class="card">
-                    <img src="${item.download_url}" class="card-image"/>
-                    <p>${item.author}</p>
-                </div>`
-            cards = cards + cardBlock;
-            resultNode.innerHTML = cards;
-        });
-    } else {
-        resultNode.innerHTML = 'Число вне диапазона!';
-    }
+const btn = document.querySelector('.j-btn');
+const result = document.querySelector('.j-result');
+function useRequest(url){
+	return fetch(url)
+		.then((response) => {
+			return response.url;
+		})
+		.then((url) => {
+			return url;
+		})
+		.catch(() => {
+			console.log('Error');
+		});
 }
-
-btnNode.addEventListener('click', () => {
-    useRequest('https://picsum.photos/v2/list/?limit=', displayResult);
-})
+btn.addEventListener ('click', async() =>{
+	const width = Number(document.querySelector('.width-input').value);
+	const height = Number(document.querySelector('.height-input').value);
+	if((width >= 100 && width <= 300)&&(height >= 100 && height <= 300)){
+		let url = `https://picsum.photos/${width}/${height}`
+		let resultUrl = await useRequest(url);
+		const image = `<img src="${resultUrl}" width="auto" height="auto"/>`;
+		result.innerHTML = image;
+	}else{
+		result.innerHTML = 'Одно из чисел вне диапазона!';
+	}
+});
